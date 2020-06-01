@@ -18,8 +18,8 @@ const App = (): ReactElement => {
       getUsersTopArtists(authToken)
       .then((data: TopArtistSuccessReponse) => {
         const topArtists = data.items;
-        const topArtistsNames = topArtists.map(artist => artist.name);
-        console.log(topArtistsNames)
+        const topArtistNames = topArtists.map(artist => artist.name);
+        console.log(topArtistNames);
       })
     }
   })
