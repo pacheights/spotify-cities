@@ -8,6 +8,5 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "ignoreBuildErrors": true,
   }
 }
