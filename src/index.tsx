@@ -91,7 +91,7 @@ const App = (): ReactElement => {
         {
           topGenres.map((genre, index) => (
             <p key={index}>
-              {genre[0]}: {genre[1]}
+              <strong>{genre[0]}</strong>: {genre[1]}
             </p>
           ))
         }
