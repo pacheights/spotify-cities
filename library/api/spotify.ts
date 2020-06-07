@@ -4,9 +4,10 @@ const { client_id } = secret_info;
 
 export function openSpotifyAuth(): void {
   const redirectUri = 'http://localhost:8080/';
+  const prodRedirectUri = 'https://spotify-cities.now.sh/';
   const scope = 'user-read-private user-read-email user-top-read';
   const responseType = 'token';
-  const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=${responseType}&redirect_uri=${redirectUri}&scope=${scope}`;
+  const authUrl = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=${responseType}&redirect_uri=${prodRedirectUri}&scope=${scope}`;
 
   window.location.replace(authUrl);
 }
