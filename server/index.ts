@@ -1,6 +1,7 @@
 import express from "express";
 const cors = require('cors');
 const fetch = require('node-fetch');
+const getLocations = require('../worker/scrape');
 const SECRET_KEYS = require('../secret-keys');
 
 const app = express();
@@ -9,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/authorize', (req, res) => {
-  const { client_id } = SECRET_KEYS;
+  const { client_id } = SECRET_KEYS.default;
   const redirectUri = 'http://localhost:3000/';
   const scope = 'user-read-private user-read-email user-top-read';
   const responseType = 'token';
@@ -27,7 +28,10 @@ app.get('/artists', (req, res) => {
     }
   })
   .then((res: any) => res.json())
-  .then((json: any) => res.send(json))
+  .then(async (json: any) => {
+    const artistIds = json.items.map((item: any) => item.id);
+    res.send(await getLocations(artistIds))
+  })
 })
 
 app.listen(port, () => console.log(`listening on port ${port}`))
