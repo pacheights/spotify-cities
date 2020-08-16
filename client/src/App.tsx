@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { City } from "../../types/server";
 
 const BASE_URL = 'http://localhost:443';
 
 function App() {
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState([] as City[]);
 
   useEffect(() => {
     const url = window.location.href;
@@ -14,8 +15,8 @@ function App() {
 
     fetch(`${BASE_URL}/artists?token=${accessToken}`)
     .then(res => res.json())
-    .then(json => {
-      setLocations(json)
+    .then((locations: City[]) => {
+      setLocations(locations)
     })
   })
 
@@ -28,9 +29,9 @@ function App() {
       </button>
       <div>
         {
-          locations.map(locationObj => {
-            const city = Object.keys(locationObj)[0];
-            const listeners = locationObj[city];
+          locations.map(location => {
+            const city = location.location;
+            const listeners = location.listeners;
             return (
               <p>{`${city}: ${listeners}`}</p>
             )

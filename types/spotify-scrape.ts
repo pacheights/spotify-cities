@@ -2,6 +2,9 @@ export interface ArtistLocation {
   [city: string]: string;
 };
 
-export interface Location {
-  [city: string]: number;
+export interface Cities {
+  [location: string]: {
+    artists: string[];
+    listeners: number;
+  }
 }

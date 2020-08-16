@@ -1,5 +1,6 @@
 import express from "express";
 import { TopArtistSuccessReponse } from "../types/spotify";
+import { Cities } from "../types/spotify-scrape";
 const cors = require('cors');
 const fetch = require('node-fetch');
 const path = require('path');
@@ -8,7 +9,7 @@ const { SECRET_KEYS } = require('../secret-keys');
 
 const app = express();
 const port = 443;
-const frontend_port = 443;
+const frontend_port = 3000;
 app.use(express.static(path.join(__dirname, 'build')))
 app.use(express.json());
 app.use(cors());
@@ -38,7 +39,17 @@ app.get('/artists', (req, res) => {
   .then((res: any) => res.json())
   .then(async (spotifyRes: TopArtistSuccessReponse) => {
     const artistIds = spotifyRes.items.map(artist => artist.id);
-    res.send(await getLocations(artistIds))
+    const locations: Cities = await getLocations(artistIds);
+    const locationsWithArtists = Object.keys(locations).map(location => {
+      return {
+        ...locations[location],
+        location,
+        artists: [...locations[location].artists.map(id => {
+          return spotifyRes.items.find(artist => artist.id === id).name;
+        })]
+      }
+    })
+    res.send(locationsWithArtists)
   })
 })
 

@@ -1,18 +1,18 @@
 // the scrape code that will go on the server
 
-import { ArtistLocation, Location } from "../types/spotify-scrape";
+import { ArtistLocation, Cities } from "../types/spotify-scrape";
 
 const puppeteer = require('puppeteer');
-const getLocations = async (ids: number[]) => {
+const getLocations = async (ids: string[]) => {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    const locations: Location = {}
+    const locations: Cities = {}
     for (let id of ids) {
       const url = `https://open.spotify.com/artist/${id}/about`;
       await page.goto(url);
       try {
-        await page.waitForSelector('#main', { timeout: 700 });
+        await page.waitForSelector('#main', { timeout: 600 });
   
         const artistLocations: ArtistLocation[] = await page.evaluate(() => {
           const cityElements = Array.from(document.querySelectorAll('.ArtistAbout__city__name'));
@@ -31,19 +31,23 @@ const getLocations = async (ids: number[]) => {
         artistLocations.map(locationObj => {
           const city = Object.keys(locationObj)[0];
           const listeners = parseInt(locationObj[city], 10);
-          locations[city] = locations[city] ? locations[city] + listeners : listeners;
+          if (locations[city]) {
+            locations[city]["listeners"] = locations[city]["listeners"] + listeners;
+            locations[city]["artists"] = [...locations[city]["artists"], id]
+          } else {
+            locations[city] = {
+              listeners: listeners,
+              artists: [id]
+            };
+          }
         })
       } catch (error) {
-        console.log(id)
+        console.log(id, error.toString().slice(0,50))
       }
     }
 
-    const sortedLocations = Object.keys(locations)
-    .map(location => ({[location]: locations[location]}))
-    .sort((a, b) => b[Object.keys(b)[0]] - a[Object.keys(a)[0]])
-
     await browser.close();
-    return sortedLocations;
+    return locations;
   } catch (error) {
     console.log(error);
   }
