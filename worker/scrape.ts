@@ -1,18 +1,20 @@
 // the scrape code that will go on the server
 
+import { ArtistLocation, Location } from "../types/spotify-scrape";
+
 const puppeteer = require('puppeteer');
-module.exports = async (ids) => {
+const getLocations = async (ids: number[]) => {
   try {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
-    const locations = {}
+    const locations: Location = {}
     for (let id of ids) {
       const url = `https://open.spotify.com/artist/${id}/about`;
       await page.goto(url);
       try {
         await page.waitForSelector('#main', { timeout: 700 });
   
-        const artistLocations = await page.evaluate(() => {
+        const artistLocations: ArtistLocation[] = await page.evaluate(() => {
           const cityElements = Array.from(document.querySelectorAll('.ArtistAbout__city__name'));
           const listenerElements = Array.from(document.querySelectorAll('.ArtistAbout__city__listeners'));
           const cities = cityElements.map(element => element.innerHTML);
@@ -25,7 +27,7 @@ module.exports = async (ids) => {
             }
           })
         })
-        // console.log(artistLocations)
+
         artistLocations.map(locationObj => {
           const city = Object.keys(locationObj)[0];
           const listeners = parseInt(locationObj[city], 10);
@@ -46,3 +48,6 @@ module.exports = async (ids) => {
     console.log(error);
   }
 }
+
+export default getLocations;
+export { getLocations };
