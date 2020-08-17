@@ -8,7 +8,12 @@ interface IProps {
 
 function City(props: IProps) {
   return (
-    <div>
+    <div
+      style={{
+        marginLeft: 20,
+        marginBottom: 30
+      }}
+    >
       <h4>{props.rank}) {props.location.location}</h4>
       <div
         style={{

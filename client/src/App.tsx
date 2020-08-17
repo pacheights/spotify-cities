@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { City as Location } from "../../types/server";
 import City from './components/City';
-
+import Map from './components/Map';
+import { Col, Row, Button } from 'antd';
+import { getGeocode } from "use-places-autocomplete";
 const BASE_URL = 'http://localhost:443';
 
 const data: Location[] = [
@@ -29,6 +31,10 @@ const data: Location[] = [
 
 function App() {
   const [locations, setLocations] = useState([] as Location[]);
+  const [coordinates, setCoordinates] = useState({
+    lat: 0,
+    long: 0,
+  })
 
   useEffect(() => {
     const url = window.location.href;
@@ -41,34 +47,66 @@ function App() {
 
     return;
     
-    if (!accessToken || locations?.length > 0) return;
+    // if (!accessToken || locations?.length > 0) return;
 
-    fetch(`${BASE_URL}/artists?token=${accessToken}`)
-    .then(res => res.json())
-    .then((locations: Location[]) => {
-      setLocations(locations.sort((a, b) => {
-        return b.listeners - a.listeners;
-      }))
-    })
+    // fetch(`${BASE_URL}/artists?token=${accessToken}`)
+    // .then(res => res.json())
+    // .then((locations: Location[]) => {
+    //   setLocations(locations.sort((a, b) => {
+    //     return b.listeners - a.listeners;
+    //   }))
+    // })
   })
 
   return (
     <div className="App">
-      <button onClick={async () => {
-        window.location.replace(`${BASE_URL}/authorize`);
-      }}>
-        Connect to Spotify
-      </button>
-      <div>
-        {
-          locations.map((location, index) => (
-            <City 
-              location={location}
-              rank={index + 1}
-            />
-          ))
-        }
-      </div>
+      <Row>
+        <Col
+          span={14}
+          style={{
+            overflowY: 'scroll',
+            height: '100vh'
+          }}
+        >
+          <Button 
+            type='primary'
+            style={{
+              marginLeft: 20,
+              marginBottom: 10
+            }}
+            onClick={async () => {
+              window.location.replace(`${BASE_URL}/authorize`);
+            }}
+          >
+            Connect to Spotify
+          </Button>
+          {locations.map((location, index) => (
+            <div
+              onMouseEnter={async () => {
+                const googleLocation = (await getGeocode({address: location.location}))[0];
+                console.log(googleLocation)
+                if (!googleLocation) return;
+                setCoordinates({
+                  lat: googleLocation.geometry.location.lat(),
+                  long: googleLocation.geometry.location.lng()
+                })
+              }}
+            >
+              <City
+                key={location.location}
+                location={location}
+                rank={index + 1}
+              />
+            </div>
+          ))}
+        </Col>
+        <Col span={10}>
+          <Map
+            lat={coordinates.lat}
+            long={coordinates.long}
+          />
+        </Col>
+      </Row>
     </div>
   );
 }
