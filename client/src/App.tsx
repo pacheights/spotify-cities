@@ -1,22 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { City } from "../../types/server";
+import { City as Location } from "../../types/server";
+import City from './components/City';
 
 const BASE_URL = 'http://localhost:443';
 
+const data: Location[] = [
+  {
+    listeners: 2240,
+    location: 'Miami, US',
+    artists: ['Tame Impala', 'Polo & Pan', 'J Balvin']
+  },
+  {
+    listeners: 3500,
+    location: 'Libson, PT',
+    artists: ['Polo & Pan', 'Panda Bear', 'Animal Collective', 'Washed Out']
+  },
+  {
+    listeners: 4400,
+    location: 'Brooklyn, NY',
+    artists: ['Sufjan Stevens', 'Eola', 'Bob Dylan', 'Vampire Weekend']
+  },
+  {
+    listeners: 2200,
+    location: 'Paris, FR',
+    artists: ['Daft Punk', 'Polo & Pan', 'L\'Imperatrice', 'Tame Impala']
+  }
+]
+
 function App() {
-  const [locations, setLocations] = useState([] as City[]);
+  const [locations, setLocations] = useState([] as Location[]);
 
   useEffect(() => {
     const url = window.location.href;
     const params = url.split('access_token=');
     const accessToken = params[1]?.split('&')[0];
+
+    setLocations(data.sort((a, b) => {
+      return b.listeners - a.listeners;
+    }))
+
+    return;
     
     if (!accessToken || locations?.length > 0) return;
 
     fetch(`${BASE_URL}/artists?token=${accessToken}`)
     .then(res => res.json())
-    .then((locations: City[]) => {
-      setLocations(locations)
+    .then((locations: Location[]) => {
+      setLocations(locations.sort((a, b) => {
+        return b.listeners - a.listeners;
+      }))
     })
   })
 
@@ -29,13 +61,12 @@ function App() {
       </button>
       <div>
         {
-          locations.map(location => {
-            const city = location.location;
-            const listeners = location.listeners;
-            return (
-              <p>{`${city}: ${listeners}`}</p>
-            )
-          })
+          locations.map((location, index) => (
+            <City 
+              location={location}
+              rank={index + 1}
+            />
+          ))
         }
       </div>
     </div>
