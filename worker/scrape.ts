@@ -13,7 +13,6 @@ const getLocations = async (ids: string[]) => {
       await page.goto(url);
       try {
         await page.waitForSelector('#main', { timeout: 600 });
-  
         const artistLocations: ArtistLocation[] = await page.evaluate(() => {
           const cityElements = Array.from(document.querySelectorAll('.ArtistAbout__city__name'));
           const listenerElements = Array.from(document.querySelectorAll('.ArtistAbout__city__listeners'));

@@ -49,6 +49,7 @@ app.get('/artists', (req, res) => {
         })]
       }
     })
+    console.log(locationsWithArtists)
     res.send(locationsWithArtists)
   })
 })

@@ -41,21 +41,20 @@ function App() {
     const params = url.split('access_token=');
     const accessToken = params[1]?.split('&')[0];
 
-    setLocations(data.sort((a, b) => {
-      return b.listeners - a.listeners;
-    }))
-
-    return;
+    // setLocations(data.sort((a, b) => {
+    //   return b.listeners - a.listeners;
+    // }))
+    // return;
     
-    // if (!accessToken || locations?.length > 0) return;
+    if (!accessToken || locations?.length > 0) return;
 
-    // fetch(`${BASE_URL}/artists?token=${accessToken}`)
-    // .then(res => res.json())
-    // .then((locations: Location[]) => {
-    //   setLocations(locations.sort((a, b) => {
-    //     return b.listeners - a.listeners;
-    //   }))
-    // })
+    fetch(`${BASE_URL}/artists?token=${accessToken}`)
+    .then(res => res.json())
+    .then((locations: Location[]) => {
+      setLocations(locations.sort((a, b) => {
+        return b.listeners - a.listeners;
+      }))
+    })
   })
 
   return (
